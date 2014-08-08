@@ -2,6 +2,10 @@
 
 var Mongo = require('mongodb');
 
+Object.defineProperty(Transfer, 'collection', {
+  get: function(){return global.mongodb.collection('transfers');}
+});
+
 function Transfer(obj){
   this.id = obj.id * 1;
   this.date = new Date();
@@ -12,5 +16,10 @@ function Transfer(obj){
   this.amount = obj.amount * 1;
   this.fee = 25;
 }
+
+Transfer.save = function(obj, cb){
+  var t = new Transfer(obj);
+  Transfer.collection.save(t, cb);
+};
 
 module.exports = Transfer;
