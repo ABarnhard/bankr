@@ -24,7 +24,6 @@ Transfer.save = function(obj, cb){
 
 Transfer.findById = function(id, cb){
   id = (typeof id === 'string') ? Mongo.ObjectID(id) : id;
-  console.log(id);
   Transfer.collection.findOne({_id:id}, cb);
 };
 

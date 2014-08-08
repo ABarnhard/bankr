@@ -17,7 +17,7 @@ describe('Transfer', function(){
     });
   });
   beforeEach(function(done){
-    cp.execFile(__dirname + '/../scripts/freshdb.sh', [db], {cwd:__dirname + '/../scripts'}, function(){
+    cp.execFile(__dirname + '/../scripts/freshdb.sh', [db], {cwd: __dirname + '/../scripts'}, function(){
       done();
     });
   });
