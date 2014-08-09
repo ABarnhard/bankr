@@ -5,6 +5,7 @@ var async = require('async');
 var Transfer = require('./transfer');
 var Mongo = require('mongodb');
 
+// create getter for db collection
 Object.defineProperty(Account, 'collection', {
   get: function(){return global.mongodb.collection('accounts');}
 });
@@ -28,16 +29,16 @@ Account.create = function(obj, cb){
 };
 
 Account.findAll = function(cb){
-  Account.collection.find().toArray(function(err, objs){
-    var accounts = objs.map(function(o){return _.create(Account.prototype, o);});
+  Account.collection.find().toArray(function(err, accounts){
+    // attach array of associated account transfers based on transferIds property
     async.map(accounts, makeAccount, cb);
   });
 };
 
 Account.findById = function(id, cb){
   id = makeOid(id);
-  Account.collection.findOne({_id:id}, function(err, obj){
-    var account = _.create(Account.prototype, obj);
+  Account.collection.findOne({_id:id}, function(err, account){
+    // attach associated transfer objects for display
     async.map(account.transferIds, function(tId, done){
       makeTransfer(tId, done, account.name);
     }, function(err, transfers){
@@ -49,11 +50,15 @@ Account.findById = function(id, cb){
 
 Account.deposit = function(obj, cb){
   var id = makeOid(obj.id);
-  var query = {_id:id}, fields = {fields:{balance:1, pin:1, numTransacts:1}};
+  var query = {_id:id};
+  // only return the listed fields from database
+  var fields = {fields:{balance:1, pin:1, numTransacts:1}};
+  // make copy of object since will be altering properties
   var deposit = _.cloneDeep(obj);
   deposit.amount *= 1;
   Account.collection.findOne(query, fields, function(err, a){
     //console.log(err, dbObj, deposit);
+    // if the pin matches, perform deposit and update record in dbase
     if(obj.pin === a.pin){
       a.balance += deposit.amount;
       deposit.id = a.numTransacts + 1;
@@ -93,6 +98,7 @@ Account.withdraw = function(obj, cb){
 };
 
 Account.transaction = function(obj, cb){
+  // type of transaction switch to move logic from controller into model
   if(obj.type === 'deposit'){
     Account.deposit(obj, cb);
   }else{
@@ -105,12 +111,16 @@ Account.transfer = function(obj, cb){
   obj.toId = makeOid(obj.toId);
   obj.amount *= 1;
   var total = obj.amount + 25;
+  // return the balance & pin of the transferor from dbase
   Account.collection.findOne({_id:obj.fromId}, {fields:{balance:1, pin:1}}, function(err, a){
     //console.log(a);
+    // if pin matches and sufficient funds, perform transfer
     if(obj.pin === a.pin && a.balance >= total){
       a.balance -= total;
+      // create new transfer object
       Transfer.save(obj, function(err, t){
         //console.log(t);
+        // update both the transferor & transferee in dbase with adjusted balance and new transferId
         Account.collection.update({_id:a._id}, {$set:{balance:a.balance}, $push:{transferIds:t._id}}, function(){
           Account.collection.update({_id:obj.toId}, {$inc:{balance:obj.amount}, $push:{transferIds:t._id}}, function(){
             if(cb){cb();}
