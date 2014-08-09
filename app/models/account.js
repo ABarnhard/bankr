@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var async = require('async');
 var Transfer = require('./transfer');
+var Mongo = require('mongodb');
 
 Object.defineProperty(Account, 'collection', {
   get: function(){return global.mongodb.collection('accounts');}
@@ -45,7 +46,29 @@ Account.findAll = function(cb){
         done(err, account);
       });
     }, function(err, fullAccounts){
+      //console.log(fullAccounts[0].transfers);
       cb(fullAccounts);
+    });
+  });
+};
+
+Account.findById = function(id, cb){
+  id = (typeof id === 'string') ? Mongo.ObjectID(id) : id;
+  Account.collection.findOne({_id:id}, function(err, obj){
+    var account = _.create(Account.prototype, obj);
+    async.map(account.transferIds, function(tId, done){
+      Transfer.findById(tId, function(err, transfer){
+        if(transfer.from === account.name){
+          transfer.from = '';
+        }else{
+          transfer.to = '';
+          transfer.fee = '';
+        }
+        done(null, transfer);
+      });
+    }, function(err, transfers){
+      account.transfers = transfers;
+      cb(account);
     });
   });
 };

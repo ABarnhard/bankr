@@ -49,7 +49,16 @@ describe('Account', function(){
     it('should return all accounts in database', function(done){
       Account.findAll(function(accounts){
         expect(accounts).to.have.length(3);
-        expect(accounts[0].transactions[0].id).to.equal(1);
+        expect(accounts[0].transfers[0].id).to.equal(1);
+        done();
+      });
+    });
+  });
+  describe('.findById', function(){
+    it('should return one account from database', function(done){
+      Account.findById('100000000000000000000001', function(a){
+        expect(a.name).to.equal('Bob');
+        expect(a.transfers).to.have.length(4);
         done();
       });
     });
