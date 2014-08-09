@@ -2,6 +2,7 @@
 
 var Account = require('../models/account');
 var moment = require('moment');
+var accountHelper = require('../helpers/accounts_helper');
 
 exports.init = function(req, res){
   res.render('accounts/init');
@@ -21,7 +22,7 @@ exports.index = function(req, res){
 
 exports.show = function(req, res){
   Account.findById(req.params.id, function(account){
-    res.render('accounts/show', {account:account, moment:moment});
+    res.render('accounts/show', {account:account, moment:moment, helper:accountHelper});
   });
 };
 

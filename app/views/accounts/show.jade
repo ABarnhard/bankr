@@ -34,7 +34,7 @@ block content
               th Fee
           tbody
             each tr in account.transactions
-              tr
+              tr(style='background-color:#{helper.wd(tr.type)};')
                 td= tr.id
                 td= moment(tr.date).format('ll')
                 td= tr.type
@@ -52,7 +52,7 @@ block content
               th Fee
           tbody
             each tr in account.transfers
-              tr
+              tr(style='background-color:#{helper.tf(tr.from)};')
                 td= tr.id
                 td= moment(tr.date).format('ll')
                 td= tr.from
