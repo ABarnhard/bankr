@@ -172,5 +172,31 @@ describe('Account', function(){
         });
       });
     });
+    it('should not transfer funds from one account to another (wrong PIN)', function(done){
+      Account.transfer({from:'Bob', to:'Jim', pin:'1264', fromId:bobId, toId:jimId, amount:'250'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.transferIds).to.have.length(4);
+          Account.findById(jimId, function(a2){
+            expect(a2.balance).to.be.closeTo(100, 0.1);
+            expect(a2.transferIds).to.have.length(4);
+            done();
+          });
+        });
+      });
+    });
+    it('should not transfer funds from one account to another (Not enough money)', function(done){
+      Account.transfer({from:'Bob', to:'Jim', pin:'1234', fromId:bobId, toId:jimId, amount:'1000'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.transferIds).to.have.length(4);
+          Account.findById(jimId, function(a2){
+            expect(a2.balance).to.be.closeTo(100, 0.1);
+            expect(a2.transferIds).to.have.length(4);
+            done();
+          });
+        });
+      });
+    });
   });
 });

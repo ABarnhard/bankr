@@ -106,11 +106,11 @@ Account.transfer = function(obj, cb){
   obj.amount *= 1;
   var total = obj.amount + 25;
   Account.collection.findOne({_id:obj.fromId}, {fields:{balance:1, pin:1}}, function(err, a){
-    console.log(a);
+    //console.log(a);
     if(obj.pin === a.pin && a.balance >= total){
       a.balance -= total;
       Transfer.save(obj, function(err, t){
-        console.log(t);
+        //console.log(t);
         Account.collection.update({_id:a._id}, {$set:{balance:a.balance}, $push:{transferIds:t._id}}, function(){
           Account.collection.update({_id:obj.toId}, {$inc:{balance:obj.amount}, $push:{transferIds:t._id}}, function(){
             if(cb){cb();}
