@@ -6,6 +6,7 @@
 var expect = require('chai').expect;
 var Account = require('../../app/models/account');
 var connect = require('../../app/lib/mongodb');
+var Mongo = require('mongodb');
 var cp = require('child_process');
 var db = 'bankr-test';
 
@@ -34,6 +35,14 @@ describe('Account', function(){
       expect(a.balance).to.be.closeTo(950, 0.1);
       expect(a.transactions).to.have.length(0);
       expect(a.transfers).to.have.length(0);
+    });
+  });
+  describe('.save', function(){
+    it('should save an account to database', function(done){
+      Account.save({name:'Bob', color:'#FF851B', photo:'url', pin:'1234', type:'checking', deposit:'950'}, function(err, a){
+        expect(a._id).to.be.instanceof(Mongo.ObjectID);
+        done();
+      });
     });
   });
 });
