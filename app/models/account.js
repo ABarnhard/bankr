@@ -48,6 +48,15 @@ Account.findById = function(id, cb){
   });
 };
 
+Account.findByIdLite = function(id, cb){
+  id = makeOid(id);
+  //console.log(id);
+  Account.collection.findOne({_id:id}, {fields:{name:1, type:1}}, function(err, account){
+    //console.log(err, account);
+    cb(account);
+  });
+};
+
 Account.deposit = function(obj, cb){
   var id = makeOid(obj.id);
   var query = {_id:id};

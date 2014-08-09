@@ -68,6 +68,16 @@ describe('Account', function(){
       });
     });
   });
+  describe('.findByIdLite', function(){
+    it('should return name, type, & _id for one account from database', function(done){
+      Account.findByIdLite(bobId, function(a){
+        expect(a.name).to.equal('Bob');
+        expect(a.type).to.equal('checking');
+        expect(Object.keys(a)).to.have.length(3);
+        done();
+      });
+    });
+  });
   describe('.deposit', function(){
     it('should increase account balance', function(done){
       Account.deposit({id:bobId, type:'deposit', pin:'1234', amount:'500'}, function(){
