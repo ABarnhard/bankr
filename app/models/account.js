@@ -49,18 +49,41 @@ Account.findById = function(id, cb){
 
 Account.deposit = function(obj, cb){
   var id = (typeof obj.id === 'string') ? Mongo.ObjectID(obj.id) : obj.id;
-  var query = {_id:id};
-  var fields = {balance:1, pin:1, numTransacts:1};
+  var query = {_id:id}, fields = {balance:1, pin:1, numTransacts:1};
   var deposit = _.cloneDeep(obj);
+  deposit.amount *= 1;
   Account.collection.findOne(query, fields, function(err, dbObj){
     //console.log(err, dbObj, deposit);
     if(obj.pin === dbObj.pin){
-      dbObj.balance += (deposit.amount * 1);
+      dbObj.balance += deposit.amount;
       deposit.id = dbObj.numTransacts + 1;
       deposit.fee = '';
-      delete deposit.pin;
       deposit.date = new Date();
+      delete deposit.pin;
       Account.collection.update(query, {$set:{balance:dbObj.balance}, $inc:{numTransacts:1}, $push:{transactions:deposit}}, function(){
+        if(cb){cb();}
+      });
+    }else{
+      if(cb){cb();}
+    }
+  });
+};
+
+Account.withdraw = function(obj, cb){
+  var id = (typeof obj.id === 'string') ? Mongo.ObjectID(obj.id) : obj.id;
+  var query = {_id:id}, fields = {balance:1, pin:1, numTransacts:1};
+  var withdraw = _.cloneDeep(obj);
+  withdraw.amount *= 1;
+  Account.collection.findOne(query, fields, function(err, dbObj){
+    //console.log(err, dbObj, withdraw);
+    if(obj.pin === dbObj.pin){
+      dbObj.balance -= withdraw.amount;
+      dbObj.balance -= (dbObj.balance < 0) ? 50 : 0;
+      withdraw.id = dbObj.numTransacts + 1;
+      withdraw.fee = (dbObj.balance < 0) ? 50 : '';
+      withdraw.date = new Date();
+      delete withdraw.pin;
+      Account.collection.update(query, {$set:{balance:dbObj.balance}, $inc:{numTransacts:1}, $push:{transactions:withdraw}}, function(){
         if(cb){cb();}
       });
     }else{

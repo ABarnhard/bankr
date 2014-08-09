@@ -73,6 +73,7 @@ describe('Account', function(){
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
           expect(a.transactions[2].id).to.equal(3);
+          expect(a.transactions[2].date).to.respondTo('getDay');
           done();
         });
       });
@@ -83,6 +84,44 @@ describe('Account', function(){
           expect(a.balance).to.be.closeTo(500, 0.1);
           expect(a.numTransacts).to.equal(2);
           expect(a.transactions).to.have.length(2);
+          done();
+        });
+      });
+    });
+  });
+  describe('.withdraw', function(){
+    it('should reduce balance by amount', function(done){
+      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1234', amount:'250'}, function(){
+        Account.findById('100000000000000000000001', function(a){
+          expect(a.balance).to.be.closeTo(250, 0.1);
+          expect(a.numTransacts).to.equal(3);
+          expect(a.transactions).to.have.length(3);
+          expect(a.transactions[2].id).to.equal(3);
+          expect(a.transactions[2].date).to.respondTo('getDay');
+          expect(a.transactions[2].fee).to.equal('');
+          done();
+        });
+      });
+    });
+    it('should not reduce balance by amount (incorrect PIN)', function(done){
+      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1235', amount:'250'}, function(){
+        Account.findById('100000000000000000000001', function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.numTransacts).to.equal(2);
+          expect(a.transactions).to.have.length(2);
+          done();
+        });
+      });
+    });
+    it('should reduce balance by amount & charge 50 overdraft', function(done){
+      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1234', amount:'550'}, function(){
+        Account.findById('100000000000000000000001', function(a){
+          expect(a.balance).to.be.closeTo(-100, 0.1);
+          expect(a.numTransacts).to.equal(3);
+          expect(a.transactions).to.have.length(3);
+          expect(a.transactions[2].id).to.equal(3);
+          expect(a.transactions[2].date).to.respondTo('getDay');
+          expect(a.transactions[2].fee).to.equal(50);
           done();
         });
       });
