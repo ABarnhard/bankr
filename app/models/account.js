@@ -17,11 +17,12 @@ function Account(obj){
   this.type = obj.type;
   this.pin = obj.pin;
   this.balance = obj.deposit * 1;
+  this.numTrans = 0;
   this.transactions = [];
   this.transferIds = [];
 }
 
-Account.save = function(obj, cb){
+Account.create = function(obj, cb){
   var a = new Account(obj);
   Account.collection.save(a, cb);
 };

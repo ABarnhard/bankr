@@ -33,13 +33,14 @@ describe('Account', function(){
       expect(a.pin).to.equal('1234');
       expect(a.type).to.equal('checking');
       expect(a.balance).to.be.closeTo(950, 0.1);
+      expect(a.numTrans).to.equal(0);
       expect(a.transactions).to.have.length(0);
       expect(a.transferIds).to.have.length(0);
     });
   });
-  describe('.save', function(){
-    it('should save an account to database', function(done){
-      Account.save({name:'Bob', color:'#FF851B', photo:'url', pin:'1234', type:'checking', deposit:'950'}, function(err, a){
+  describe('.create', function(){
+    it('should create a new account in database', function(done){
+      Account.create({name:'Bob', color:'#FF851B', photo:'url', pin:'1234', type:'checking', deposit:'950'}, function(err, a){
         expect(a._id).to.be.instanceof(Mongo.ObjectID);
         done();
       });
