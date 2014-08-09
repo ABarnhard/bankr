@@ -33,15 +33,7 @@ Account.findAll = function(cb){
 
     async.map(accounts, function(account, done){
       async.map(account.transferIds, function(tId, done1){
-        Transfer.findById(tId, function(err, transfer){
-          if(transfer.from === account.name){
-            transfer.from = '';
-          }else{
-            transfer.to = '';
-            transfer.fee = '';
-          }
-          done1(null, transfer);
-        });
+        makeTransfer(tId, done1, account.name);
       }, function(err, viewTransfers){
         account.transfers = viewTransfers;
         done(err, account);
@@ -58,15 +50,7 @@ Account.findById = function(id, cb){
   Account.collection.findOne({_id:id}, function(err, obj){
     var account = _.create(Account.prototype, obj);
     async.map(account.transferIds, function(tId, done){
-      Transfer.findById(tId, function(err, transfer){
-        if(transfer.from === account.name){
-          transfer.from = '';
-        }else{
-          transfer.to = '';
-          transfer.fee = '';
-        }
-        done(null, transfer);
-      });
+      makeTransfer(tId, done, account.name);
     }, function(err, transfers){
       account.transfers = transfers;
       cb(account);
@@ -75,3 +59,17 @@ Account.findById = function(id, cb){
 };
 
 module.exports = Account;
+
+// Helper Functions
+
+function makeTransfer(tId, cb, name){
+  Transfer.findById(tId, function(err, transfer){
+    if(transfer.from === name){
+      transfer.from = '';
+    }else{
+      transfer.to = '';
+      transfer.fee = '';
+    }
+    cb(null, transfer);
+  });
+}
