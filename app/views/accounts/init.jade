@@ -1,0 +1,32 @@
+extends ../shared/template
+block content
+  #new
+    h2 Create a new account
+    form(method='post', action='/accounts')
+      table
+        tbody
+          tr
+            td: label Name
+            td: label Color
+          tr
+            td: input(type='text', name='name', placeholder='Bob Boberson')
+            td: input(type='color', name='color', value='#7fdbff')
+          tr
+            td: label Photo URL
+            td: label PIN#
+          tr
+            td: input(type='text', name='photo', placeholder='http://link/to/my/photo.jpg')
+            td: input(type='text', name='pin', placeholder='1234')
+          tr
+            td: label Acct Type
+            td: label Deposit
+          tr
+            td
+              select(name='type')
+                option(value='checking') Checking
+                option(value='savings') Savings
+            td: input(type='number', name='deposit', placeholder='1500')
+          tr
+            td(colspan='2'): button Create Account
+
+
