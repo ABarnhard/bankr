@@ -77,5 +77,15 @@ describe('Account', function(){
         });
       });
     });
+    it('should not increase account balance (incorrect PIN)', function(done){
+      Account.deposit({id:'100000000000000000000001', type:'deposit', pin:'1236', amount:'500'}, function(){
+        Account.findById('100000000000000000000001', function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.numTransacts).to.equal(2);
+          expect(a.transactions).to.have.length(2);
+          done();
+        });
+      });
+    });
   });
 });
