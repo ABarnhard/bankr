@@ -1,5 +1,63 @@
 extends ../shared/template
 block content
   #accountpage
-    h1 Build the shit here
+    #head
+      #info
+        table
+          tbody
+            tr
+              td Name:
+              td= account.name
+            tr
+              td Balance:
+              td $#{account.balance.toFixed(2)}
+            tr
+              td Type:
+              td= account.type
+            tr
+              td Opened:
+              td= moment(account.opened).format('ll')
+      #photo
+        img(src='#{account.photo}', height='100px', width='100px')
+      #options
+        a(href='/accounts/#{account._id}/transaction') TRANSACTION
+        a(href='/accounts/#{account._id}/transfer') TRANSFER
+    #activity
+      #transactions
+        table
+          thead
+            tr
+              th Id
+              th Date
+              th Type
+              th Amount
+              th Fee
+          tbody
+            each tr in account.transactions
+              tr
+                td= tr.id
+                td= moment(tr.date).format('ll')
+                td= tr.type
+                td $#{tr.amount.toFixed(2)}
+                td $#{tr.fee}
+      #transfers
+        table
+          thead
+            tr
+              th Id
+              th Date
+              th From
+              th To
+              th Amount
+              th Fee
+          tbody
+            each tr in account.transfers
+              tr
+                td= tr.id
+                td= moment(tr.date).format('ll')
+                td= tr.from
+                td= tr.to
+                td $#{tr.amount.toFixed(2)}
+                td $#{tr.fee}
+
 

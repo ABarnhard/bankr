@@ -29,6 +29,7 @@ Account.create = function(obj, cb){
 };
 
 Account.findAll = function(cb){
+  // returns only fields needed for /accounts view
   Account.collection.find({}, {sort:{name:1}, fields:{name:1, color:1, balance:1, type:1, opened:1}}).toArray(function(err, accounts){
     cb(err, accounts);
   });
