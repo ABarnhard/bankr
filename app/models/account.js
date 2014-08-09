@@ -92,6 +92,14 @@ Account.withdraw = function(obj, cb){
   });
 };
 
+Account.transaction = function(obj, cb){
+  if(obj.type === 'deposit'){
+    Account.deposit(obj, cb);
+  }else{
+    Account.withdraw(obj, cb);
+  }
+};
+
 module.exports = Account;
 
 // Helper Functions
