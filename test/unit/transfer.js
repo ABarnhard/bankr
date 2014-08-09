@@ -18,7 +18,7 @@ describe('Transfer', function(){
   });
   beforeEach(function(done){
     cp.execFile(__dirname + '/../scripts/freshdb.sh', [db], {cwd: __dirname + '/../scripts'}, function(err, stdout, stderr){
-      console.log(err, stdout, stderr);
+      //console.log(err, stdout, stderr);
       done();
     });
   });

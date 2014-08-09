@@ -18,7 +18,7 @@ describe('Account', function(){
   });
   beforeEach(function(done){
     cp.execFile(__dirname + '/../scripts/freshdb.sh', [db], {cwd:__dirname + '/../scripts'}, function(err, stdout, stderr){
-      console.log(err, stdout, stderr);
+      //console.log(err, stdout, stderr);
       done();
     });
   });
@@ -49,7 +49,7 @@ describe('Account', function(){
   });
   describe('.findAll', function(){
     it('should return all accounts in database', function(done){
-      Account.findAll(function(accounts){
+      Account.findAll(function(err, accounts){
         expect(accounts).to.have.length(3);
         expect(accounts[0].transfers[0].id).to.equal(1);
         done();

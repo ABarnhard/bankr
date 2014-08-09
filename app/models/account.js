@@ -30,18 +30,7 @@ Account.create = function(obj, cb){
 Account.findAll = function(cb){
   Account.collection.find().toArray(function(err, objs){
     var accounts = objs.map(function(o){return _.create(Account.prototype, o);});
-
-    async.map(accounts, function(account, done){
-      async.map(account.transferIds, function(tId, done1){
-        makeTransfer(tId, done1, account.name);
-      }, function(err, viewTransfers){
-        account.transfers = viewTransfers;
-        done(err, account);
-      });
-    }, function(err, fullAccounts){
-      //console.log(fullAccounts[0].transfers);
-      cb(fullAccounts);
-    });
+    async.map(accounts, makeAccount, cb);
   });
 };
 
@@ -62,6 +51,16 @@ module.exports = Account;
 
 // Helper Functions
 
+function makeAccount(account, cb){
+  async.map(account.transferIds, function(tId, done){
+    makeTransfer(tId, done, account.name);
+  }, function(err, transfers){
+    //console.log(transfers);
+    account.transfers = transfers;
+    cb(err, account);
+  });
+}
+
 function makeTransfer(tId, cb, name){
   Transfer.findById(tId, function(err, transfer){
     if(transfer.from === name){
@@ -70,6 +69,7 @@ function makeTransfer(tId, cb, name){
       transfer.to = '';
       transfer.fee = '';
     }
+    //console.log(name, transfer);
     cb(null, transfer);
   });
 }
