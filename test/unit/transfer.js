@@ -39,7 +39,7 @@ describe('Transfer', function(){
   });
   describe('.save', function(){
     it('should save a transfer into the database', function(done){
-      Transfer.save({from:'Bob', fromId:'000000000000000000000001', to:'Sally', toId:'000000000000000000000003', amount:'500'}, function(err, t){
+      Transfer.save({from:'Bob', fromId:'100000000000000000000001', to:'Sally', toId:'100000000000000000000003', amount:'500'}, function(err, t){
         expect(t._id).to.be.instanceof(Mongo.ObjectID);
         expect(t.id).to.equal(7);
         done();
