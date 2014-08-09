@@ -10,6 +10,10 @@ var Mongo = require('mongodb');
 var cp = require('child_process');
 var db = 'bankr-test';
 
+var bobId   = '100000000000000000000001';
+var jimId   = '100000000000000000000002';
+//var sallyId = '100000000000000000000003';
+
 describe('Account', function(){
   before(function(done){
     connect(db, function(){
@@ -58,7 +62,7 @@ describe('Account', function(){
   });
   describe('.findById', function(){
     it('should return one account from database', function(done){
-      Account.findById('100000000000000000000001', function(a){
+      Account.findById(bobId, function(a){
         expect(a.name).to.equal('Bob');
         expect(a.transfers).to.have.length(4);
         done();
@@ -67,8 +71,8 @@ describe('Account', function(){
   });
   describe('.deposit', function(){
     it('should increase account balance', function(done){
-      Account.deposit({id:'100000000000000000000001', type:'deposit', pin:'1234', amount:'500'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.deposit({id:bobId, type:'deposit', pin:'1234', amount:'500'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(1000, 0.1);
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
@@ -79,8 +83,8 @@ describe('Account', function(){
       });
     });
     it('should not increase account balance (incorrect PIN)', function(done){
-      Account.deposit({id:'100000000000000000000001', type:'deposit', pin:'1236', amount:'500'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.deposit({id:bobId, type:'deposit', pin:'1236', amount:'500'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(500, 0.1);
           expect(a.numTransacts).to.equal(2);
           expect(a.transactions).to.have.length(2);
@@ -91,8 +95,8 @@ describe('Account', function(){
   });
   describe('.withdraw', function(){
     it('should reduce balance by amount', function(done){
-      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1234', amount:'250'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.withdraw({id:bobId, type:'withdraw', pin:'1234', amount:'250'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(250, 0.1);
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
@@ -104,8 +108,8 @@ describe('Account', function(){
       });
     });
     it('should not reduce balance by amount (incorrect PIN)', function(done){
-      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1235', amount:'250'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.withdraw({id:bobId, type:'withdraw', pin:'1235', amount:'250'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(500, 0.1);
           expect(a.numTransacts).to.equal(2);
           expect(a.transactions).to.have.length(2);
@@ -114,8 +118,8 @@ describe('Account', function(){
       });
     });
     it('should reduce balance by amount & charge 50 overdraft', function(done){
-      Account.withdraw({id:'100000000000000000000001', type:'withdraw', pin:'1234', amount:'550'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.withdraw({id:bobId, type:'withdraw', pin:'1234', amount:'550'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(-100, 0.1);
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
@@ -129,8 +133,8 @@ describe('Account', function(){
   });
   describe('.transaction', function(){
     it('should perform a deposit', function(done){
-      Account.transaction({id:'100000000000000000000001', type:'deposit', pin:'1234', amount:'500'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.transaction({id:bobId, type:'deposit', pin:'1234', amount:'500'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(1000, 0.1);
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
@@ -141,8 +145,8 @@ describe('Account', function(){
       });
     });
     it('should perform a withdrawal', function(done){
-      Account.transaction({id:'100000000000000000000001', type:'withdraw', pin:'1234', amount:'250'}, function(){
-        Account.findById('100000000000000000000001', function(a){
+      Account.transaction({id:bobId, type:'withdraw', pin:'1234', amount:'250'}, function(){
+        Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(250, 0.1);
           expect(a.numTransacts).to.equal(3);
           expect(a.transactions).to.have.length(3);
@@ -150,6 +154,21 @@ describe('Account', function(){
           expect(a.transactions[2].date).to.respondTo('getDay');
           expect(a.transactions[2].fee).to.equal('');
           done();
+        });
+      });
+    });
+  });
+  describe('.transfer', function(){
+    it('should transfer funds from one account to another', function(done){
+      Account.transfer({from:'Bob', to:'Jim', pin:'1234', fromId:bobId, toId:jimId, amount:'250'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(225, 0.1);
+          expect(a.transferIds).to.have.length(5);
+          Account.findById(jimId, function(a2){
+            expect(a2.balance).to.be.closeTo(350, 0.1);
+            expect(a2.transferIds).to.have.length(5);
+            done();
+          });
         });
       });
     });
