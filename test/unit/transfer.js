@@ -33,6 +33,7 @@ describe('Transfer', function(){
       expect(t.fromId).to.be.instanceof(Mongo.ObjectID);
       expect(t.toId).to.be.instanceof(Mongo.ObjectID);
       expect(t.amount).to.equal(500);
+      expect(t.fee).to.equal(25);
     });
   });
   describe('.save', function(){
