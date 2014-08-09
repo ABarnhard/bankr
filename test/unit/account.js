@@ -34,7 +34,7 @@ describe('Account', function(){
       expect(a.pin).to.equal('1234');
       expect(a.type).to.equal('checking');
       expect(a.balance).to.be.closeTo(950, 0.1);
-      expect(a.numTrans).to.equal(0);
+      expect(a.numTransacts).to.equal(0);
       expect(a.transactions).to.have.length(0);
       expect(a.transferIds).to.have.length(0);
     });
@@ -62,6 +62,19 @@ describe('Account', function(){
         expect(a.name).to.equal('Bob');
         expect(a.transfers).to.have.length(4);
         done();
+      });
+    });
+  });
+  describe('.deposit', function(){
+    it('should increase account balance', function(done){
+      Account.deposit({id:'100000000000000000000001', type:'deposit', pin:'1234', amount:'500'}, function(){
+        Account.findById('100000000000000000000001', function(a){
+          expect(a.balance).to.be.closeTo(1000, 0.1);
+          expect(a.numTransacts).to.equal(3);
+          expect(a.transactions).to.have.length(3);
+          expect(a.transactions[2].id).to.equal(3);
+          done();
+        });
       });
     });
   });

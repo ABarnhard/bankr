@@ -18,8 +18,12 @@ function Transfer(obj){
 }
 
 Transfer.save = function(obj, cb){
-  var t = new Transfer(obj);
-  Transfer.collection.save(t, cb);
+  Transfer.collection.count(function(err, count){
+    //console.log(count);
+    obj.id = count + 1;
+    var t = new Transfer(obj);
+    Transfer.collection.save(t, cb);
+  });
 };
 
 Transfer.findById = function(id, cb){

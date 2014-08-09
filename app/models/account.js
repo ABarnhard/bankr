@@ -17,7 +17,7 @@ function Account(obj){
   this.type = obj.type;
   this.pin = obj.pin;
   this.balance = obj.deposit * 1;
-  this.numTrans = 0;
+  this.numTransacts = 0;
   this.transactions = [];
   this.transferIds = [];
 }
@@ -44,6 +44,28 @@ Account.findById = function(id, cb){
       account.transfers = transfers;
       cb(account);
     });
+  });
+};
+
+Account.deposit = function(obj, cb){
+  var id = (typeof obj.id === 'string') ? Mongo.ObjectID(obj.id) : obj.id;
+  var query = {_id:id};
+  var fields = {balance:1, pin:1, numTransacts:1};
+  var deposit = _.cloneDeep(obj);
+  Account.collection.findOne(query, fields, function(err, dbObj){
+    //console.log(err, dbObj, deposit);
+    if(obj.pin === dbObj.pin){
+      dbObj.balance += (deposit.amount * 1);
+      deposit.id = dbObj.numTransacts + 1;
+      deposit.fee = '';
+      delete deposit.pin;
+      deposit.date = new Date();
+      Account.collection.update(query, {$set:{balance:dbObj.balance}, $inc:{numTransacts:1}, $push:{transactions:deposit}}, function(){
+        if(cb){cb();}
+      });
+    }else{
+      if(cb){cb();}
+    }
   });
 };
 
