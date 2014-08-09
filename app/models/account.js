@@ -29,9 +29,8 @@ Account.create = function(obj, cb){
 };
 
 Account.findAll = function(cb){
-  Account.collection.find().toArray(function(err, accounts){
-    // attach array of associated account transfers based on transferIds property
-    async.map(accounts, makeAccount, cb);
+  Account.collection.find({}, {sort:{name:1}, fields:{name:1, color:1, balance:1, type:1, opened:1}}).toArray(function(err, accounts){
+    cb(err, accounts);
   });
 };
 
@@ -139,16 +138,6 @@ module.exports = Account;
 
 function makeOid(id){
   return (typeof id === 'string') ? Mongo.ObjectID(id) : id;
-}
-
-function makeAccount(account, cb){
-  async.map(account.transferIds, function(tId, done){
-    makeTransfer(tId, done, account.name);
-  }, function(err, transfers){
-    //console.log(transfers);
-    account.transfers = transfers;
-    cb(err, account);
-  });
 }
 
 function makeTransfer(tId, cb, name){

@@ -55,7 +55,6 @@ describe('Account', function(){
     it('should return all accounts in database', function(done){
       Account.findAll(function(err, accounts){
         expect(accounts).to.have.length(3);
-        expect(accounts[0].transfers[0].id).to.equal(1);
         done();
       });
     });
