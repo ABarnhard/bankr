@@ -13,7 +13,7 @@ block content
         each account in accounts
           tr(style='background-color:#{account.color};')
             td: a(href='/accounts/#{account._id}')= account.name
-            td $#{account.balance.toFixed(2)}
+            td= helper.currencyFormat(account.balance)
             td= account.type
             td= moment(account.opened).format('ll')
 

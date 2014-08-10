@@ -29,3 +29,7 @@ exports.tOptions = function(accounts, id){
   return options.join('');
 };
 
+exports.currencyFormat = function (num) {
+  return '$' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+};
+

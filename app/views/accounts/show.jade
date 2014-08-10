@@ -10,7 +10,7 @@ block content
               td= account.name
             tr
               td Balance:
-              td $#{account.balance.toFixed(2)}
+              td= helper.currencyFormat(account.balance)
             tr
               td Type:
               td= account.type
@@ -39,7 +39,7 @@ block content
                 td= tr.id
                 td= moment(tr.date).format('ll')
                 td= tr.type
-                td $#{tr.amount.toFixed(2)}
+                td= helper.currencyFormat(tr.amount)
                 td $#{tr.fee}
       #transfers
         table
@@ -58,7 +58,7 @@ block content
                 td= moment(tr.date).format('ll')
                 td= tr.from
                 td= tr.to
-                td $#{tr.amount.toFixed(2)}
+                td= helper.currencyFormat(tr.amount)
                 td $#{tr.fee}
 
 

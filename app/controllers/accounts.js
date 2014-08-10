@@ -16,7 +16,7 @@ exports.create = function(req, res){
 
 exports.index = function(req, res){
   Account.findAll(function(err, accounts){
-    res.render('accounts/index', {accounts:accounts, moment:moment});
+    res.render('accounts/index', {accounts:accounts, moment:moment, helper:accountHelper});
   });
 };
 
