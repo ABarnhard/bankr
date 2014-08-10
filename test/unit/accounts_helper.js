@@ -43,4 +43,11 @@ describe('Accounts_Helper', function(){
       expect(test).to.equal('<option value="888">Sally</option>');
     });
   });
+  describe('.currencyFormat', function(){
+    it('should format a number into currency', function(){
+      var num = 1000;
+      var test = helper.currencyFormat(num);
+      expect(test).to.equal('$1,000.00');
+    });
+  });
 });
