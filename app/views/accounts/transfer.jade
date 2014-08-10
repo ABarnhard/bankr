@@ -1,0 +1,25 @@
+extends ../shared/template
+block content
+  #transfer
+    h3 Transfer Funds
+    form(method='post', action='/accounts/#{id}/transfer')
+      input(type='hidden', name='_method', value='put')
+      input(type='hidden', name='fromId', value='#{id}')
+      input(type='hidden', name='from', value='#{helper.tFrom(accounts, id)}')
+      table
+        tbody
+          tr
+            td(colspan='2') From:
+            td(colspan='2')= helper.tFrom(accounts, id)
+          tr
+            td(colspan='2') To:
+            td(colspan='2')
+              select(name='toId')
+                != helper.tOptions(accounts, id)
+          tr
+            td Pin:
+            td: input(type='text', name='pin', placeholder='1234')
+            td Amount:
+            td: input(type='number', name='amount', placeholder='100.00')
+          tr
+            td(colspan=4): button Transfer Funds

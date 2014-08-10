@@ -27,23 +27,26 @@ exports.show = function(req, res){
 };
 
 exports.transactionInit = function(req, res){
-  res.render('accounts/transaction', {id:req.params.id});
+  Account.findByIdLite(req.params.id, function(account){
+    res.render('accounts/transaction', {account:account});
+  });
 };
 
 exports.transaction = function(req, res){
   req.body.id = req.params.id;
   Account.transaction(req.body, function(){
-    res.redirect('/account/' + req.params.id);
+    res.redirect('/accounts/' + req.params.id);
   });
 };
 
 exports.transferInit = function(req, res){
   Account.findAll(function(err, accounts){
-    res.render('accounts/transfer', {accounts:accounts, id:req.params.id});
+    res.render('accounts/transfer', {accounts:accounts, id:req.params.id, helper:accountHelper});
   });
 };
 
 exports.transfer = function(req, res){
+  console.log(req.body);
   Account.transfer(req.body, function(){
     res.redirect('/accounts/' + req.params.id);
   });

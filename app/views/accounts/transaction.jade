@@ -1,0 +1,22 @@
+extends ../shared/template
+block content
+  #transaction
+    h3 #{account.name}'s #{account.type} Account
+    form(method='post', action='/accounts/#{account._id}/transaction')
+      input(type='hidden', name='_method', value='put')
+      table
+        tbody
+          tr
+            td: input(type='radio', name='type', value='deposit')
+            td Deposit
+          tr
+            td: input(type='radio', name='type', value='withdraw')
+            td Withdrawal
+          tr
+            td PIN:
+            td: input(type='text', name='pin', placeholder='1234')
+            td Amount:
+            td: input(type='number', name='amount', placeholder='100.00')
+          tr
+            td(colspan='4'): button Submit Transaction
+

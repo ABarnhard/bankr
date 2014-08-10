@@ -97,6 +97,7 @@ Account.withdraw = function(obj, cb){
       withdraw.fee = (a.balance < 0) ? 50 : '';
       withdraw.date = new Date();
       delete withdraw.pin;
+      //console.log(withdraw);
       Account.collection.update(query, {$set:{balance:a.balance}, $inc:{numTransacts:1}, $push:{transactions:withdraw}}, function(){
         if(cb){cb();}
       });
@@ -126,13 +127,18 @@ Account.transfer = function(obj, cb){
     // if pin matches and sufficient funds, perform transfer
     if(obj.pin === a.pin && a.balance >= total){
       a.balance -= total;
-      // create new transfer object
-      Transfer.save(obj, function(err, t){
-        //console.log(t);
-        // update both the transferor & transferee in dbase with adjusted balance and new transferId
-        Account.collection.update({_id:a._id}, {$set:{balance:a.balance}, $push:{transferIds:t._id}}, function(){
-          Account.collection.update({_id:obj.toId}, {$inc:{balance:obj.amount}, $push:{transferIds:t._id}}, function(){
-            if(cb){cb();}
+      // get the to name for the to property
+      Account.collection.findOne({_id:obj.toId}, {fields:{name:1}}, function(err, acct){
+        //console.log(err, acct);
+        obj.to = acct.name;
+        // create new transfer object
+        Transfer.save(obj, function(err, t){
+          //console.log(t);
+          // update both the transferor & transferee in dbase with adjusted balance and new transferId
+          Account.collection.update({_id:a._id}, {$set:{balance:a.balance}, $push:{transferIds:t._id}}, function(){
+            Account.collection.update({_id:obj.toId}, {$inc:{balance:obj.amount}, $push:{transferIds:t._id}}, function(){
+              if(cb){cb();}
+            });
           });
         });
       });
