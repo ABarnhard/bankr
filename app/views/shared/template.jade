@@ -6,12 +6,13 @@ html
     link(rel='stylesheet', href='/css/style.css')
   body
     .wrapper
-      h1 Banker
-      nav
-        ul
-          li: a(href='/') Home
-          li: a(href='/accounts') View Accounts
-          li: a(href='/accounts/new') Add Account
+      div
+        h1 Bankr
+        nav
+          ul
+            li: a(href='/accounts/new') Add Account
+            li: a(href='/accounts') View Accounts
+            li: a(href='/') Home
       .container
         block content
 
