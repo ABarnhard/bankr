@@ -19,9 +19,15 @@ h2 {
   clear: both;
 }
 
-nav ul li {
+nav ul {
   display: inline-block;
   list-style: none;
+  padding: 15px;
+  float: right;
+}
+
+nav ul li {
+  display: inline-block;
   padding: 15px;
   float: right;
 }
@@ -63,4 +69,8 @@ table {
 
 #head div {
   display: inline-block;
+}
+
+.wrapper, .wrapper div {
+  position: relative;
 }
