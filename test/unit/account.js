@@ -79,69 +79,11 @@ describe('Account', function(){
     });
   });
   describe('.deposit', function(){
-    it('should increase account balance', function(done){
-      Account.deposit({id:bobId, type:'deposit', pin:'1234', amount:'500'}, function(){
-        Account.findById(bobId, function(a){
-          expect(a.balance).to.be.closeTo(1000, 0.1);
-          expect(a.numTransacts).to.equal(3);
-          expect(a.transactions).to.have.length(3);
-          expect(a.transactions[2].id).to.equal(3);
-          expect(a.transactions[2].date).to.respondTo('getDay');
-          done();
-        });
-      });
-    });
-    it('should not increase account balance (incorrect PIN)', function(done){
-      Account.deposit({id:bobId, type:'deposit', pin:'1236', amount:'500'}, function(){
-        Account.findById(bobId, function(a){
-          expect(a.balance).to.be.closeTo(500, 0.1);
-          expect(a.numTransacts).to.equal(2);
-          expect(a.transactions).to.have.length(2);
-          done();
-        });
-      });
-    });
   });
   describe('.withdraw', function(){
-    it('should reduce balance by amount', function(done){
-      Account.withdraw({id:bobId, type:'withdraw', pin:'1234', amount:'250'}, function(){
-        Account.findById(bobId, function(a){
-          expect(a.balance).to.be.closeTo(250, 0.1);
-          expect(a.numTransacts).to.equal(3);
-          expect(a.transactions).to.have.length(3);
-          expect(a.transactions[2].id).to.equal(3);
-          expect(a.transactions[2].date).to.respondTo('getDay');
-          expect(a.transactions[2].fee).to.equal('');
-          done();
-        });
-      });
-    });
-    it('should not reduce balance by amount (incorrect PIN)', function(done){
-      Account.withdraw({id:bobId, type:'withdraw', pin:'1235', amount:'250'}, function(){
-        Account.findById(bobId, function(a){
-          expect(a.balance).to.be.closeTo(500, 0.1);
-          expect(a.numTransacts).to.equal(2);
-          expect(a.transactions).to.have.length(2);
-          done();
-        });
-      });
-    });
-    it('should reduce balance by amount & charge 50 overdraft', function(done){
-      Account.withdraw({id:bobId, type:'withdraw', pin:'1234', amount:'550'}, function(){
-        Account.findById(bobId, function(a){
-          expect(a.balance).to.be.closeTo(-100, 0.1);
-          expect(a.numTransacts).to.equal(3);
-          expect(a.transactions).to.have.length(3);
-          expect(a.transactions[2].id).to.equal(3);
-          expect(a.transactions[2].date).to.respondTo('getDay');
-          expect(a.transactions[2].fee).to.equal(50);
-          done();
-        });
-      });
-    });
   });
   describe('.transaction', function(){
-    it('should perform a deposit', function(done){
+    it('should deposit funds & increase account balance', function(done){
       Account.transaction({id:bobId, type:'deposit', pin:'1234', amount:'500'}, function(){
         Account.findById(bobId, function(a){
           expect(a.balance).to.be.closeTo(1000, 0.1);
@@ -149,6 +91,16 @@ describe('Account', function(){
           expect(a.transactions).to.have.length(3);
           expect(a.transactions[2].id).to.equal(3);
           expect(a.transactions[2].date).to.respondTo('getDay');
+          done();
+        });
+      });
+    });
+    it('should not deposit or increase account balance (incorrect PIN)', function(done){
+      Account.transaction({id:bobId, type:'deposit', pin:'1236', amount:'500'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.numTransacts).to.equal(2);
+          expect(a.transactions).to.have.length(2);
           done();
         });
       });
@@ -162,6 +114,42 @@ describe('Account', function(){
           expect(a.transactions[2].id).to.equal(3);
           expect(a.transactions[2].date).to.respondTo('getDay');
           expect(a.transactions[2].fee).to.equal('');
+          done();
+        });
+      });
+    });
+    it('should withdraw & reduce balance by amount', function(done){
+      Account.transaction({id:bobId, type:'withdraw', pin:'1234', amount:'250'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(250, 0.1);
+          expect(a.numTransacts).to.equal(3);
+          expect(a.transactions).to.have.length(3);
+          expect(a.transactions[2].id).to.equal(3);
+          expect(a.transactions[2].date).to.respondTo('getDay');
+          expect(a.transactions[2].fee).to.equal('');
+          done();
+        });
+      });
+    });
+    it('should not reduce balance by amount (incorrect PIN)', function(done){
+      Account.transaction({id:bobId, type:'withdraw', pin:'1235', amount:'250'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(500, 0.1);
+          expect(a.numTransacts).to.equal(2);
+          expect(a.transactions).to.have.length(2);
+          done();
+        });
+      });
+    });
+    it('should reduce balance by amount & charge 50 overdraft', function(done){
+      Account.transaction({id:bobId, type:'withdraw', pin:'1234', amount:'550'}, function(){
+        Account.findById(bobId, function(a){
+          expect(a.balance).to.be.closeTo(-100, 0.1);
+          expect(a.numTransacts).to.equal(3);
+          expect(a.transactions).to.have.length(3);
+          expect(a.transactions[2].id).to.equal(3);
+          expect(a.transactions[2].date).to.respondTo('getDay');
+          expect(a.transactions[2].fee).to.equal(50);
           done();
         });
       });

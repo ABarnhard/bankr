@@ -57,63 +57,28 @@ Account.findByIdLite = function(id, cb){
   });
 };
 
-Account.deposit = function(obj, cb){
-  var id = makeOid(obj.id);
-  var query = {_id:id};
-  // only return the listed fields from database
-  var fields = {fields:{balance:1, pin:1, numTransacts:1}};
-  // make copy of object since will be altering properties
-  var deposit = _.cloneDeep(obj);
-  deposit.amount *= 1;
-  Account.collection.findOne(query, fields, function(err, a){
-    //console.log(err, dbObj, deposit);
-    // if the pin matches, perform deposit and update record in dbase
-    if(obj.pin === a.pin){
-      a.balance += deposit.amount;
-      deposit.id = a.numTransacts + 1;
-      deposit.fee = '';
-      deposit.date = new Date();
-      delete deposit.pin;
-      Account.collection.update(query, {$set:{balance:a.balance}, $inc:{numTransacts:1}, $push:{transactions:deposit}}, function(){
-        if(cb){cb();}
-      });
-    }else{
-      if(cb){cb();}
-    }
-  });
-};
-
-Account.withdraw = function(obj, cb){
+Account.transaction = function(obj, cb){
   var id = makeOid(obj.id);
   var query = {_id:id}, fields = {fields:{balance:1, pin:1, numTransacts:1}};
-  var withdraw = _.cloneDeep(obj);
-  withdraw.amount *= 1;
+  var t = _.cloneDeep(obj);
+  t.amount *= 1;
   Account.collection.findOne(query, fields, function(err, a){
-    //console.log(err, a, withdraw);
+    //console.log(err, a, transaction);
     if(obj.pin === a.pin){
-      a.balance -= withdraw.amount;
-      a.balance -= (a.balance < 0) ? 50 : 0;
-      withdraw.id = a.numTransacts + 1;
-      withdraw.fee = (a.balance < 0) ? 50 : '';
-      withdraw.date = new Date();
-      delete withdraw.pin;
+      t.date = new Date();
+      delete t.pin;
+      a.balance += (t.type === 'deposit') ? t.amount : t.amount * -1;
+      a.balance -= (a.balance < 0 && t.type !== 'deposit') ? 50 : 0;
+      t.id = a.numTransacts + 1;
+      t.fee = (a.balance < 0 && t.type !== 'deposit') ? 50 : '';
       //console.log(withdraw);
-      Account.collection.update(query, {$set:{balance:a.balance}, $inc:{numTransacts:1}, $push:{transactions:withdraw}}, function(){
+      Account.collection.update(query, {$set:{balance:a.balance}, $inc:{numTransacts:1}, $push:{transactions:t}}, function(){
         if(cb){cb();}
       });
     }else{
       if(cb){cb();}
     }
   });
-};
-
-Account.transaction = function(obj, cb){
-  // type of transaction switch to move logic from controller into model
-  if(obj.type === 'deposit'){
-    Account.deposit(obj, cb);
-  }else{
-    Account.withdraw(obj, cb);
-  }
 };
 
 Account.transfer = function(obj, cb){
