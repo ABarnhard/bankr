@@ -21,13 +21,13 @@ exports.index = function(req, res){
 };
 
 exports.show = function(req, res){
-  Account.findById(req.params.id, function(account){
+  Account.findById(req.params.id, {}, function(account){
     res.render('accounts/show', {account:account, moment:moment, helper:accountHelper});
   });
 };
 
 exports.transactionInit = function(req, res){
-  Account.findByIdLite(req.params.id, function(account){
+  Account.findById(req.params.id, {fields:{name:1, type:1}}, function(account){
     res.render('accounts/transaction', {account:account});
   });
 };

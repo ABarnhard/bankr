@@ -35,16 +35,20 @@ Account.findAll = function(cb){
   });
 };
 
-Account.findById = function(id, cb){
+Account.findById = function(id, fields, cb){
   id = makeOid(id);
-  Account.collection.findOne({_id:id}, function(err, account){
-    // attach associated transfer objects for display
-    async.map(account.transferIds, function(tId, done){
-      makeTransfer(tId, done, account.name);
-    }, function(err, transfers){
-      account.transfers = transfers;
+  Account.collection.findOne({_id:id}, fields, function(err, account){
+    if(!Object.keys(fields).length){
+      // attach associated transfer objects for display
+      async.map(account.transferIds, function(tId, done){
+        makeTransfer(tId, done, account.name);
+      }, function(err, transfers){
+        account.transfers = transfers;
+        cb(account);
+      });
+    }else{
       cb(account);
-    });
+    }
   });
 };
 
@@ -123,6 +127,7 @@ function makeOid(id){
 
 function makeTransfer(tId, cb, name){
   Transfer.findById(tId, function(err, transfer){
+    // 
     if(transfer.from === name){
       transfer.from = '';
     }else{
